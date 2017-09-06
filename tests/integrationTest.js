@@ -6,7 +6,7 @@
 	const request = require('request-promise');
 	const promissor = require('../index');
 
-	describe('restify-await-promise', ()=>{
+	describe('restify-await-promise - Integration', ()=>{
 
 		const host = "127.0.0.1";
 		const port = 5099;
@@ -117,9 +117,9 @@
 				function promiseFunction( req, res, next ){
 					return Promise.resolve( { success: true} );
 				}
-				serverInstance.get( '/path', promiseFunction );
+				serverInstance.post( '/path', promiseFunction );
 				return request({
-						method: 'GET',
+						method: 'POST',
 						uri: `http://${host}:${port}/path`,
 						resolveWithFullResponse: true
 				}).then( result =>{
@@ -134,9 +134,9 @@
 				function promiseFunction( req, res, next ){
 					return Promise.resolve();
 				}
-				serverInstance.get( '/path', promiseFunction );
+				serverInstance.put( '/path', promiseFunction );
 				return request({
-					method: 'GET',
+					method: 'PUT',
 					uri: `http://${host}:${port}/path`,
 					resolveWithFullResponse: true
 				}).then( result =>{
@@ -242,7 +242,112 @@
 		});
 
 		describe('Async Handler', ()=>{
+			it('should return the response when the async function returns', ()=>{
+				async function promiseFunction( req, res, next ){
+					return { success: true};
+				}
+				serverInstance.get( '/path', promiseFunction );
+				return request({
+					method: 'GET',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true
+				}).then( result =>{
+					assert.equal( result.statusCode, 200 );
+					assert.ok( result.body );
+					let body = JSON.parse( result.body );
+					assert.isTrue( body.success );
+				});
+			});
 
+			it('should return the response when the async function returns nothing', ()=>{
+				async function promiseFunction( req, res, next ){
+					return;
+				}
+				serverInstance.get( '/path', promiseFunction );
+				return request({
+					method: 'GET',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true
+				}).then( result =>{
+					assert.equal( result.statusCode, 200 );
+					assert.equal( '', result.body );
+				});
+			});
+
+			it('should not blow up if the response has already been set', ()=>{
+				async function promiseFunction( req, res, next ){
+					res.send( { success: false} );
+					return { success: true };
+				}
+				serverInstance.del( '/path', promiseFunction );
+				return request({
+					method: 'DELETE',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true
+				}).then( result =>{
+					assert.equal( result.statusCode, 200 );
+					assert.ok( result.body );
+					let body = JSON.parse( result.body );
+					assert.isFalse( body.success );
+				});
+			});
+
+			it('should not blow up if the response has already been set and next is called', ()=>{
+				async function promiseFunction( req, res, next ){
+					res.send( { success: false} );
+					next();
+				}
+				serverInstance.get( '/path', promiseFunction );
+				return request({
+					method: 'GET',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true
+				}).then( result =>{
+					assert.equal( result.statusCode, 200 );
+					assert.ok( result.body );
+					let body = JSON.parse( result.body );
+					assert.isFalse( body.success );
+				});
+			});
+
+			it('should handle the promise rejecting when the reject has a status code', ()=>{
+				async function promiseFunction( req, res, next ){
+					let errToThrow = new Error('See ya!');
+					errToThrow.statusCode = 415;
+					throw errToThrow;
+				}
+				serverInstance.get( '/path', promiseFunction );
+				return request({
+					method: 'GET',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true
+				})
+					.then( result =>{
+						assert.fail( 'Should reject here');
+					}).catch( ex =>{
+						assert.equal( ex.statusCode, 415 );
+						assert.equal( JSON.parse(ex.error).message, 'See ya!');
+					});
+			});
+
+			it('should handle the async throwing when the reject does not have a status code', ()=>{
+				async function promiseFunction( req, res, next ){
+					let errToThrow = new Error('See ya!');
+					throw errToThrow;
+				}
+				serverInstance.get( '/path', promiseFunction );
+				return request({
+					method: 'GET',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true
+				})
+					.then( result =>{
+						assert.fail( 'Should reject here');
+					}).catch( ex =>{
+						assert.equal( ex.statusCode, 500 );
+						assert.equal( JSON.parse(ex.error).message, 'See ya!');
+					});
+			});
 
 		});
 

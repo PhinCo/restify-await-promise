@@ -1,36 +1,42 @@
 ( function(){
 	'use strict';
 
-	const httpMethods = ['del', 'get', 'head', 'opts', 'post', 'put', 'patch'];
+
 
 	function _supportPromises( restifyServer, options ){
 		if( !restifyServer ) throw new Error("Can't help you if you don't give me a server.");
+		['del', 'get', 'head', 'opts', 'post', 'put', 'patch'].forEach( method => {
+			const previous = restifyServer[method];
+			restifyServer[method] = function(){
+				const args = [].slice.call( arguments );
+				const handler = args[args.length - 1];
+
+				if( _isFunction( handler ) ){
+					const wrappedFunc = _wrapRouteFunction( handler );
+					args.splice( args.length - 1, 1, wrappedFunc );
+				}
+
+				previous.apply( restifyServer, args );
+			};
+		});
+	}
+
+	function _wrapRouteFunction( lastFunc, options ){
 		if (!options) options = {};
 		const logger = options.logger || false;
 		const errorTransformer = options.customErrorHandler || false;
+		return function _wrappedRouteHandler( req, res, next ){
 
-		function _wrapRouteFunction( lastFunc ){
-			return function _wrappedRouteHandler( req, res, next ){
+			let nextCalled = false;
+			const newNext = function(){
+				if( nextCalled === true ) return;
+				nextCalled = true;
+				next.apply( null, arguments );
+			};
 
-				let nextCalled = false;
-				const newNext = function(){
-					if( nextCalled === true ) return;
-					nextCalled = true;
-					next.apply( null, arguments );
-				};
-
-				let routeInvocation = null;
-
-				try{
-					routeInvocation = lastFunc( req, res, newNext );
-				}catch( error ){
-					if( logger ) logger.error( "HANDLED ERROR: ", error );
-					let restError = !errorTransformer ? error  : errorTransformer.transform( error );
-					newNext( restError );
-					return;
-				}
-
-				if( _isPromise( routeInvocation ) ){
+			try{
+				let routeInvocation = lastFunc( req, res, newNext );
+				if( _isPromise( routeInvocation ) || _isAsync( routeInvocation ) ){
 					routeInvocation
 						.then( body => {
 							if( _shouldSendResponse( res ) ){
@@ -55,27 +61,17 @@
 					}
 					newNext();
 				}
-			};
-		}
 
-
-		httpMethods.forEach( method => {
-			const previous = restifyServer[method];
-			restifyServer[method] = function(){
-				const args = [].slice.call( arguments );
-				const handler = args[args.length - 1];
-
-				if( _isFunction( handler ) ){
-					const wrappedFunc = _wrapRouteFunction( handler );
-					args.splice( args.length - 1, 1, wrappedFunc );
-				}
-
-				previous.apply( restifyServer, args );
-			};
-		});
+			}catch( error ){
+				if( logger ) logger.error( "HANDLED ERROR: ", error );
+				let restError = !errorTransformer ? error  : errorTransformer.transform( error );
+				newNext( restError );
+				return;
+			}
+		};
 	}
 
-	/**
+		/**
 	 * NOTE: Modifies body
 	 *
 	 * Allows routes to change response status code by providing a statusCode property
@@ -110,10 +106,11 @@
 	}
 
 	function _isAsync( candidate ){
-		return !!candidate && candidate[Symbol.toStringTag] === 'AsyncFunction';
+		return !!Symbol && !!candidate && candidate[Symbol.toStringTag] === 'AsyncFunction';
 	}
 
 	exports.supportPromises = _supportPromises;
+	exports._wrapRouteFunction = _wrapRouteFunction;
 
 
 })();
