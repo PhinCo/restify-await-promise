@@ -15,7 +15,7 @@
 
 		beforeEach( done =>{
 			serverInstance = restify.createServer({name: 'testServer'});
-			promissor.supportPromises( serverInstance );
+			promissor.install( serverInstance );
 			serverInstance.listen( port, host );
 			done();
 		});

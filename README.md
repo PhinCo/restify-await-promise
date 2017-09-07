@@ -30,7 +30,7 @@ const options = {
 	errorTransformer: alwaysBlameTheUserErrorTransformer //Optional: Lets you add status codes 
 };
 
-restifyPromise.supportPromises( server, options ); // Options is not required
+restifyPromise.install( server, options ); // Options is not required
 
 //Async function, automatically calls send with the returned object and next
 server.get('/lookup/:name', async function (req, res) {

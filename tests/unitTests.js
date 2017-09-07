@@ -32,7 +32,7 @@
 
 		it('should error when not given a server', ()=>{
 			assert.throws( () =>{
-				promissor.supportPromises( void 0 );
+				promissor.install( void 0 );
 			}, `Can't help you if you don't give me a server.`);
 		});
 

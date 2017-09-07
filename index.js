@@ -1,7 +1,7 @@
 ( function(){
 	'use strict';
 
-	function _supportPromises( restifyServer, options ){
+	function _install( restifyServer, options ){
 		if( !restifyServer ) throw new Error(`Can't help you if you don't give me a server.`);
 		['del', 'get', 'head', 'opts', 'post', 'put', 'patch'].forEach( method => {
 			const previous = restifyServer[method];
@@ -115,7 +115,7 @@
 		return !_isFunction( valueReturned );
 	}
 
-	exports.supportPromises = _supportPromises;
+	exports.install = _install;
 	exports._wrapRouteFunction = _wrapRouteFunction;
 
 })();
