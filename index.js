@@ -1,8 +1,6 @@
 ( function(){
 	'use strict';
 
-
-
 	function _supportPromises( restifyServer, options ){
 		if( !restifyServer ) throw new Error("Can't help you if you don't give me a server.");
 		['del', 'get', 'head', 'opts', 'post', 'put', 'patch'].forEach( method => {
@@ -29,7 +27,7 @@
 		return function _wrappedRouteHandler( req, res, next ){
 
 			let nextCalled = false;
-			const newNext = function(){
+			const wrappedNext = function(){
 				if( nextCalled === true ) return;
 				nextCalled = true;
 				next.apply( null, arguments );
@@ -38,24 +36,24 @@
 			function doErrorHandling( error ){
 				if( logger ) logger.error( "HANDLED ERROR: ", error );
 				let restError = !errorTransformer ? error  : errorTransformer.transform( error );
-				newNext( restError );
+				wrappedNext( restError );
 			}
 
-			function callSendAndNextIfNeeded( res, body ){
+			function callSendAndNextAsNeeded( res, body ){
 				if( _shouldSendResponse( res ) ){
 					const statusCode = _extractStatusCodeFromBody( body );
 					res.status( statusCode );
 					res.send( body );
 				}
-				newNext();
+				wrappedNext();
 			}
 
 			try{
-				let valueReturnedFromFunction = funcToWrap( req, res, newNext );
+				let valueReturnedFromFunction = funcToWrap( req, res, wrappedNext );
 				if( _isPromise( valueReturnedFromFunction ) || _isAsync( valueReturnedFromFunction ) ){
 					valueReturnedFromFunction
 						.then( body => {
-							callSendAndNextIfNeeded( res, body )
+							callSendAndNextAsNeeded( res, body )
 						})
 						.catch( error => {
 							doErrorHandling( error )
@@ -65,7 +63,7 @@
 					if ( _isFunction( valueReturnedFromFunction) ) {
 						throw new Error( 'Functions should not be returned from route invocations.' );
 					}
-					callSendAndNextIfNeeded( res, valueReturnedFromFunction );
+					callSendAndNextAsNeeded( res, valueReturnedFromFunction );
 				}
 			}catch( error ){
 				doErrorHandling( error );
@@ -113,6 +111,5 @@
 
 	exports.supportPromises = _supportPromises;
 	exports._wrapRouteFunction = _wrapRouteFunction;
-
-
+	
 })();

@@ -169,7 +169,7 @@
 				assert.equal( errorSpyArgs[1].message, 'Foo bar');
 			});
 
-			it('should call next with the error from the transformer when the function throws and log if given a logger', ()=>{
+			it('should call next with the error from the transformer when the function throws and log when given a logger', ()=>{
 				function routeFunctionToWrap ( req,res,next ){
 					throw new Error('Foo bar');
 				}
