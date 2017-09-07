@@ -55,7 +55,7 @@
 				}
 
 				if( _isPromise( valueReturnedFromFunction ) || _isAsync( valueReturnedFromFunction ) ){
-					valueReturnedFromFunction
+					return valueReturnedFromFunction
 						.then( body => {
 							callSendAndNextAsNeeded( res, body )
 						})
