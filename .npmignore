@@ -1,0 +1,4 @@
+package-lock.json
+.travis.yml
+.eslintrc
+tests/*
