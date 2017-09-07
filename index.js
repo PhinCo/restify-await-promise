@@ -50,6 +50,10 @@
 
 			try{
 				let valueReturnedFromFunction = funcToWrap( req, res, wrappedNext );
+				if ( !_isValidReturn( valueReturnedFromFunction ) ){
+					throw new Error('Only Promises, async functions, and objects can be returned when using this plugin.')
+				}
+
 				if( _isPromise( valueReturnedFromFunction ) || _isAsync( valueReturnedFromFunction ) ){
 					valueReturnedFromFunction
 						.then( body => {
@@ -60,9 +64,6 @@
 						});
 				}
 				else if(  valueReturnedFromFunction ){
-					if ( _isFunction( valueReturnedFromFunction) ) {
-						throw new Error( 'Functions should not be returned from route invocations.' );
-					}
 					callSendAndNextAsNeeded( res, valueReturnedFromFunction );
 				}
 			}catch( error ){
@@ -109,7 +110,13 @@
 		return !!Symbol && !!candidate && candidate[Symbol.toStringTag] === 'AsyncFunction';
 	}
 
+	function _isValidReturn( valueReturned ){
+		if ( _isPromise( valueReturned ) ) return true;
+		if ( _isAsync( valueReturned ) ) return true;
+		return !_isFunction( valueReturned );
+	}
+
 	exports.supportPromises = _supportPromises;
 	exports._wrapRouteFunction = _wrapRouteFunction;
-	
+
 })();
