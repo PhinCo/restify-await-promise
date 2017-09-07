@@ -9,13 +9,14 @@ Converts restify routes to support async/await and returned promises
 
 ```javascript
 const restify = require('restify');
-const restify-promise = require('restify-await-promise');
+const restifyPromise = require('restify-await-promise');
 
 const server = restify.createServer({
   name: 'myapp',
   version: '1.0.0'
 });
 
+//Allows you to manipulate the errors before restify does its work
 const alwaysBlameTheUserErrorTransformer = {
 	transform: function( exceptionThrownByRoute ){
 		//Always blame the user
@@ -29,22 +30,15 @@ const options = {
 	errorTransformer: alwaysBlameTheUserErrorTransformer //Optional: Lets you add status codes 
 };
 
-restify-promise.supportPromises( server );
+restifyPromise.supportPromises( server, options ); // Options is not required
 
 //Async function, automatically calls send with the returned object and next
-server.get('/echo/:name', async function (req ) {
-	const params = req.params; 
-	return { params };
+server.get('/lookup/:name', async function (req, res) {
+	return await SomePromise.work( req.parms.name );
 });
 
-//Async function, manual send, automatically calls next
-server.get('/echo/:name', async function (req, res) {
-	await SomePromise.work( req.parms.name );
-	res.send({ success: true });
-});
-
-//Promise
-server.get('/echo/:name', function (req, res, next) {
+//Promise function
+server.get('/echo/:name', function (req) {
 	const params = req.params; 
 	return Promise.resolve( { params } );
 });
@@ -52,7 +46,7 @@ server.get('/echo/:name', function (req, res, next) {
 //Existing restify method
 server.get('/echo/:name', function (req, res, next) {
 	  res.send(req.params);
-	  return next();
+	  next();
 });
 
 server.listen(8080, function () {
