@@ -1,7 +1,7 @@
 # restify-await-promise
 
 [![Build Status](https://travis-ci.org/PhinCo/restify-await-promise.svg)](https://travis-ci.org/PhinCo/restify-await-promise)
-[![devDependency Status](https://david-dm.org/PhinCo/restify-await-promise/dev-status.svg)](https://david-dm.org/restify/restify-await-promise#info=devDependencies)
+[![devDependency Status](https://david-dm.org/PhinCo/restify-await-promise/dev-status.svg)](https://david-dm.org/PhinCo/restify-await-promise#info=devDependencies)
 
 Converts restify routes to support async/await and returned promises
 
