@@ -21,10 +21,11 @@
 		});
 	}
 
-	function _wrapRouteFunction( lastFunc, options ){
-		if (!options) options = {};
+	function _wrapRouteFunction( funcToWrap, options ){
+		if ( !options ) options = {};
 		const logger = options.logger || false;
-		const errorTransformer = options.customErrorHandler || false;
+		const errorTransformer = options.errorTransformer || false;
+
 		return function _wrappedRouteHandler( req, res, next ){
 
 			let nextCalled = false;
@@ -34,44 +35,45 @@
 				next.apply( null, arguments );
 			};
 
-			try{
-				let routeInvocation = lastFunc( req, res, newNext );
-				if( _isPromise( routeInvocation ) || _isAsync( routeInvocation ) ){
-					routeInvocation
-						.then( body => {
-							if( _shouldSendResponse( res ) ){
-								const statusCode = _extractStatusCodeFromBody( body );
-								res.status( statusCode );
-								res.send( body );
-							}
-							newNext();
-						})
-						.catch( error => {
-							if( logger ) logger.error( "HANDLED ERROR: ", error );
-							let restError = !errorTransformer ? error  : errorTransformer.transform( error );
-							newNext( restError );
-						});
-				}
-				else if( routeInvocation ){
-					// Route returned an object - let's send it
-					if( _shouldSendResponse( res ) ){
-						var statusCode = _extractStatusCodeFromBody( routeInvocation );
-						res.status( statusCode );
-						res.send( routeInvocation );
-					}
-					newNext();
-				}
-
-			}catch( error ){
+			function doErrorHandling( error ){
 				if( logger ) logger.error( "HANDLED ERROR: ", error );
 				let restError = !errorTransformer ? error  : errorTransformer.transform( error );
 				newNext( restError );
-				return;
+			}
+
+			function callSendAndNextIfNeeded( res, body ){
+				if( _shouldSendResponse( res ) ){
+					const statusCode = _extractStatusCodeFromBody( body );
+					res.status( statusCode );
+					res.send( body );
+				}
+				newNext();
+			}
+
+			try{
+				let valueReturnedFromFunction = funcToWrap( req, res, newNext );
+				if( _isPromise( valueReturnedFromFunction ) || _isAsync( valueReturnedFromFunction ) ){
+					valueReturnedFromFunction
+						.then( body => {
+							callSendAndNextIfNeeded( res, body )
+						})
+						.catch( error => {
+							doErrorHandling( error )
+						});
+				}
+				else if(  valueReturnedFromFunction ){
+					if ( _isFunction( valueReturnedFromFunction) ) {
+						throw new Error( 'Functions should not be returned from route invocations.' );
+					}
+					callSendAndNextIfNeeded( res, valueReturnedFromFunction );
+				}
+			}catch( error ){
+				doErrorHandling( error );
 			}
 		};
 	}
 
-		/**
+	/**
 	 * NOTE: Modifies body
 	 *
 	 * Allows routes to change response status code by providing a statusCode property
