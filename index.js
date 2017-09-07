@@ -2,7 +2,7 @@
 	'use strict';
 
 	function _supportPromises( restifyServer, options ){
-		if( !restifyServer ) throw new Error("Can't help you if you don't give me a server.");
+		if( !restifyServer ) throw new Error(`Can't help you if you don't give me a server.`);
 		['del', 'get', 'head', 'opts', 'post', 'put', 'patch'].forEach( method => {
 			const previous = restifyServer[method];
 			restifyServer[method] = function(){
@@ -10,7 +10,7 @@
 				const handler = args[args.length - 1];
 
 				if( _isFunction( handler ) ){
-					const wrappedFunc = _wrapRouteFunction( handler );
+					const wrappedFunc = _wrapRouteFunction( handler, options );
 					args.splice( args.length - 1, 1, wrappedFunc );
 				}
 
@@ -34,8 +34,8 @@
 			};
 
 			function doErrorHandling( error ){
-				if( logger ) logger.error( "HANDLED ERROR: ", error );
-				let restError = !errorTransformer ? error  : errorTransformer.transform( error );
+				if( logger ) logger.error( 'HANDLED ERROR: ', error );
+				let restError = !errorTransformer ? error : errorTransformer.transform( error );
 				wrappedNext( restError );
 			}
 
@@ -51,19 +51,18 @@
 			try{
 				let valueReturnedFromFunction = funcToWrap( req, res, wrappedNext );
 				if ( !_isValidReturn( valueReturnedFromFunction ) ){
-					throw new Error('Only Promises, async functions, and objects can be returned when using this plugin.')
+					throw new Error('Only Promises, async functions, and objects can be returned when using this plugin.');
 				}
 
 				if( _isPromise( valueReturnedFromFunction ) || _isAsync( valueReturnedFromFunction ) ){
 					return valueReturnedFromFunction
 						.then( body => {
-							callSendAndNextAsNeeded( res, body )
+							callSendAndNextAsNeeded( res, body );
 						})
 						.catch( error => {
-							doErrorHandling( error )
+							doErrorHandling( error );
 						});
-				}
-				else if(  valueReturnedFromFunction ){
+				} else if( valueReturnedFromFunction ){
 					callSendAndNextAsNeeded( res, valueReturnedFromFunction );
 				}
 			}catch( error ){

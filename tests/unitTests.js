@@ -17,7 +17,7 @@
 		function getLogger(){
 			return {
 				error: function(){}
-			}
+			};
 		}
 
 		function getErrorTransformer(){
@@ -25,14 +25,20 @@
 				transform: function(someErr){
 					return new Error('transformedError');
 				}
-			}
+			};
 		}
 
-		const req = undefined; //Will force failures because we don't want req to be used in the scenario
+		const req = void 0; //Will force failures because we don't want req to be used in the scenario
+
+		it('should error when not given a server', ()=>{
+			assert.throws( () =>{
+				promissor.supportPromises( void 0 );
+			}, `Can't help you if you don't give me a server.`);
+		});
 
 		describe('Promise and Async', ()=>{
 			it('should call next with the error when the function rejects', ()=>{
-				function routeFunctionToWrap ( req,res,next ){
+				function routeFunctionToWrap ( req, res, next ){
 					let errToThrow = new Error('Foo bar');
 					return Promise.reject( errToThrow );
 				}
@@ -56,7 +62,7 @@
 			});
 
 			it('should call next with the error when the function throws and log if given a logger', ()=>{
-				async function routeFunctionToWrap ( req,res,next ){
+				async function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
 
@@ -86,7 +92,7 @@
 			});
 
 			it('should call next with the error from the transformer when the function throws and log when given a logger', ()=>{
-				async function routeFunctionToWrap ( req,res,next ){
+				async function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
 
@@ -102,7 +108,7 @@
 				const transformerTransformSpy = sinon.spy( transformerStub, 'transform' );
 
 
-				const wrappedFunction = promissor._wrapRouteFunction( routeFunctionToWrap, { logger: loggerStub, errorTransformer:  transformerStub} );
+				const wrappedFunction = promissor._wrapRouteFunction( routeFunctionToWrap, { logger: loggerStub, errorTransformer: transformerStub} );
 				wrappedFunction( req, resStub, nextSpy )
 				.then(()=> {
 
@@ -129,7 +135,7 @@
 		describe('Callback based routes', ()=>{
 
 			it('should support default restify behavior when passed no options', ()=>{
-				function routeFunctionToWrap ( req,res,next ){
+				function routeFunctionToWrap ( req, res, next ){
 					res.send({property: "value"});
 					next();
 				}
@@ -151,7 +157,7 @@
 			});
 
 			it('should support the route returning an object with no options', ()=>{
-				function routeFunctionToWrap ( req,res,next ){
+				function routeFunctionToWrap ( req, res, next ){
 					return { property: "value" };
 				}
 
@@ -171,7 +177,7 @@
 			});
 
 			it('should support the route returning an object with a status code and no options', ()=>{
-				function routeFunctionToWrap ( req,res,next ){
+				function routeFunctionToWrap ( req, res, next ){
 					return { property: "value", statusCode: 499 };
 				}
 
@@ -191,7 +197,7 @@
 			});
 
 			it('should error when returning a function in the callback path', ()=>{
-				function routeFunctionToWrap ( req,res,next ){
+				function routeFunctionToWrap ( req, res, next ){
 					return function someFunc(){ };
 				}
 
@@ -211,7 +217,7 @@
 			});
 
 			it('should call next with the error when the function throws', ()=>{
-				function routeFunctionToWrap ( req,res,next ){
+				function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
 
@@ -231,7 +237,7 @@
 			});
 
 			it('should call next with the error when the function throws and log if given a logger', ()=>{
-				function routeFunctionToWrap ( req,res,next ){
+				function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
 
@@ -260,7 +266,7 @@
 			});
 
 			it('should call next with the error from the transformer when the function throws and log when given a logger', ()=>{
-				function routeFunctionToWrap ( req,res,next ){
+				function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
 
@@ -276,7 +282,7 @@
 				const transformerTransformSpy = sinon.spy( transformerStub, 'transform' );
 
 
-				const wrappedFunction = promissor._wrapRouteFunction( routeFunctionToWrap, { logger: loggerStub, errorTransformer:  transformerStub} );
+				const wrappedFunction = promissor._wrapRouteFunction( routeFunctionToWrap, { logger: loggerStub, errorTransformer: transformerStub} );
 				wrappedFunction( req, resStub, nextSpy );
 
 				assert.isFalse( resStatusSpy.called );

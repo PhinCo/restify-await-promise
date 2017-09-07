@@ -30,18 +30,11 @@
 			}
 		});
 
-		describe('general functions', ()=>{
-			it('should error when not given a server', ()=>{
-				assert.throws( () =>{
-					promissor.supportPromises( void 0 );
-				}, `Can't help you if you don't give me a server.`);
-			});
-		});
 
 		describe('Default Handler', ()=>{
 			it('should return the response when an object is returned', ()=>{
 				function promiseFunction( req, res, next ){
-					return  { success: true };
+					return { success: true };
 				}
 				serverInstance.get( '/path', promiseFunction );
 				return request({
@@ -58,7 +51,7 @@
 
 			it('should return the response when an object is returned', ()=>{
 				function promiseFunction( req, res, next ){
-					return  { success: true };
+					return { success: true };
 				}
 				serverInstance.get( '/path', promiseFunction );
 				return request({
@@ -75,7 +68,7 @@
 
 			it('should return the response when an object is returned with a status code', ()=>{
 				function promiseFunction( req, res, next ){
-					return  { success: true, statusCode: 205 };
+					return { success: true, statusCode: 205 };
 				}
 				serverInstance.get( '/path', promiseFunction );
 				return request({

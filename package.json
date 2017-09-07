@@ -2,9 +2,7 @@
   "name": "restify-await-promise",
   "version": "1.0.0",
   "description": "Restify Plugin to support promises and async/await",
-  "engines": {
-    "node": "8.4.0"
-  },
+  "license": "",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PhinCo/restify-await-promise.git"
@@ -19,8 +17,12 @@
     "url": "https://github.com/PhinCo/restify-await-promise/issues"
   },
   "homepage": "https://github.com/PhinCo/restify-await-promise#readme",
+  "peerDependencies": {
+    "restify": "^4.0.0"
+  },
   "devDependencies": {
     "chai": "^4.1.2",
+    "eslint": "^4.6.1",
     "mocha": "^3.5.0",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
@@ -28,6 +30,7 @@
     "sinon": "^3.2.1"
   },
   "scripts": {
-    "test": "node_modules/.bin/_mocha --recursive tests"
+    "test": "node_modules/.bin/_mocha --recursive tests",
+    "lint": "node_modules/eslint/bin/eslint.js index.js \"tests/**/*.js\""
   }
 }
