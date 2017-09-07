@@ -30,7 +30,6 @@
 			}
 		});
 
-
 		describe('Default Handler', ()=>{
 			it('should return the response when an object is returned', ()=>{
 				function promiseFunction( req, res, next ){
