@@ -62,4 +62,4 @@ $ npm install --save restify-await-promise
 
 ## Bugs
 
-See <https://travis-ci.org/PhinCo/restify-await-promise/issues>.
+See <https://github.com/PhinCo/restify-await-promise/issues>.
