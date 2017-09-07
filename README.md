@@ -25,17 +25,16 @@ const alwaysBlameTheUserErrorTransformer = {
 }
 
 const options = {
-    logger: yourLogger,                                  //Optional: Will automatically log exceptions	
-	errorTransformer: alwaysBlameTheUserErrorTransformer    //Optional: Lets you add status codes 
+	logger: yourLogger,                                  //Optional: Will automatically log exceptions	
+	errorTransformer: alwaysBlameTheUserErrorTransformer //Optional: Lets you add status codes 
 };
-
 
 restify-promise.supportPromises( server );
 
 //Async function, automatically calls send with the returned object and next
 server.get('/echo/:name', async function (req ) {
 	const params = req.params; 
-    return { params };
+	return { params };
 });
 
 //Async function, manual send, automatically calls next
@@ -47,17 +46,17 @@ server.get('/echo/:name', async function (req, res) {
 //Promise
 server.get('/echo/:name', function (req, res, next) {
 	const params = req.params; 
-    return Promise.resolve( { params } );
+	return Promise.resolve( { params } );
 });
 
 //Existing restify method
 server.get('/echo/:name', function (req, res, next) {
-  res.send(req.params);
-  return next();
+	  res.send(req.params);
+	  return next();
 });
 
 server.listen(8080, function () {
-  console.log('%s listening at %s', server.name, server.url);
+	  console.log('%s listening at %s', server.name, server.url);
 });
 ```
 
