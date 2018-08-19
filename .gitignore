@@ -2,7 +2,6 @@
 logs
 *.log
 npm-debug.log*
-.idea/*.xml
 
 # Runtime data
 pids
@@ -52,5 +51,4 @@ typings/
 
 # dotenv environment variables file
 .env
-
-*.xml
+/.idea
