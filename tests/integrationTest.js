@@ -209,7 +209,7 @@
 					assert.fail( 'Should reject here');
 				}).catch( ex =>{
 					assert.equal( ex.statusCode, 415 );
-					assert.equal( JSON.parse(ex.error).message, 'See ya!');
+					assert.notOk( JSON.parse(ex.error).message, 'Restify no longer returns messages in this way.');
 				});
 			});
 
@@ -228,7 +228,7 @@
 					assert.fail( 'Should reject here');
 				}).catch( ex =>{
 					assert.equal( ex.statusCode, 500 );
-					assert.equal( JSON.parse(ex.error).message, 'See ya!');
+					assert.equal( JSON.parse(ex.error).message, 'caused by Error: See ya!');
 				});
 			});
 		});
@@ -318,7 +318,7 @@
 						assert.fail( 'Should reject here');
 					}).catch( ex =>{
 						assert.equal( ex.statusCode, 415 );
-						assert.equal( JSON.parse(ex.error).message, 'See ya!');
+                        assert.notOk( JSON.parse(ex.error).message, 'Restify no longer returns messages in this way.');
 					});
 			});
 
@@ -337,7 +337,7 @@
 						assert.fail( 'Should reject here');
 					}).catch( ex =>{
 						assert.equal( ex.statusCode, 500 );
-						assert.equal( JSON.parse(ex.error).message, 'See ya!');
+						assert.equal( JSON.parse(ex.error).message, 'caused by Error: See ya!');
 					});
 			});
 
