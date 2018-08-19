@@ -2,8 +2,7 @@
 logs
 *.log
 npm-debug.log*
-.idea/*
-.idea/
+.idea/*.xml
 
 # Runtime data
 pids
