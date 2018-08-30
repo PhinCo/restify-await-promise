@@ -6,7 +6,7 @@
 	const request = require('request-promise');
 	const promissor = require('../index');
 
-	describe('restify-await-promise - Integration', ()=>{
+	describe('restify-await-promise - Integration', function(){
 
 		const host = "127.0.0.1";
 		const port = 5099;
@@ -30,8 +30,8 @@
 			}
 		});
 
-		describe('Default Handler', ()=>{
-			it('should return the response when an object is returned', ()=>{
+		describe('Default Handler', function(){
+			it('should return the response when an object is returned', function(){
 				function promiseFunction( req, res, next ){
 					return { success: true };
 				}
@@ -48,7 +48,7 @@
 				});
 			});
 
-			it('should return the response when an object is returned', ()=>{
+			it('should return the response when an object is returned', function(){
 				function promiseFunction( req, res, next ){
 					return { success: true };
 				}
@@ -65,7 +65,7 @@
 				});
 			});
 
-			it('should return the response when an object is returned with a status code', ()=>{
+			it('should return the response when an object is returned with a status code', function(){
 				function promiseFunction( req, res, next ){
 					return { success: true, statusCode: 205 };
 				}
@@ -83,7 +83,7 @@
 				});
 			});
 
-			it('should not blow up when the response is already set', ()=>{
+			it('should not blow up when the response is already set', function(){
 				function promiseFunction( req, res, next ){
 					res.status( 205 );
 					res.send( { success: false } );
@@ -103,9 +103,9 @@
 
 		});
 
-		describe('Promise Handler', ()=>{
+		describe('Promise Handler', function(){
 
-			it('should return the response when the promise resolves', ()=>{
+			it('should return the response when the promise resolves', function(){
 				function promiseFunction( req, res, next ){
 					return Promise.resolve( { success: true} );
 				}
@@ -122,7 +122,7 @@
 				});
 			});
 
-			it('should return the response when the promise resolves with nothing', ()=>{
+			it('should return the response when the promise resolves with nothing', function(){
 				function promiseFunction( req, res, next ){
 					return Promise.resolve();
 				}
@@ -137,7 +137,7 @@
 				});
 			});
 
-			it('should not blow up if the response has already been set', ()=>{
+			it('should not blow up if the response has already been set', function(){
 				function promiseFunction( req, res, next ){
 					res.send( { success: false} );
 
@@ -156,7 +156,7 @@
 				});
 			});
 
-			it('should not blow up if the response has already been set and next is called', ()=>{
+			it('should not blow up if the response has already been set and next is called', function(){
 				function promiseFunction( req, res, next ){
 					res.send( { success: false} );
 					next();
@@ -175,7 +175,7 @@
 				});
 			});
 
-			it('should not blow up if the response has already been set and next has been called', ()=>{
+			it('should not blow up if the response has already been set and next has been called', function(){
 				function promiseFunction( req, res, next ){
 					res.send( { success: false} );
 					next();
@@ -193,7 +193,7 @@
 				});
 			});
 
-			it('should handle the promise rejecting when the reject has a status code', ()=>{
+			it('should handle the promise rejecting when the reject has a status code', function(){
 				function promiseFunction( req, res, next ){
 					let errToThrow = new Error('See ya!');
 					errToThrow.statusCode = 415;
@@ -213,7 +213,7 @@
 				});
 			});
 
-			it('should handle the promise rejecting when the reject does not have a status code', ()=>{
+			it('should handle the promise rejecting when the reject does not have a status code', function(){
 				function promiseFunction( req, res, next ){
 					let errToThrow = new Error('See ya!');
 					return Promise.reject( errToThrow );
@@ -233,8 +233,8 @@
 			});
 		});
 
-		describe('Async Handler', ()=>{
-			it('should return the response when the async function returns', ()=>{
+		describe('Async Handler', function(){
+			it('should return the response when the async function returns', function(){
 				async function promiseFunction( req, res, next ){
 					return { success: true};
 				}
@@ -251,7 +251,7 @@
 				});
 			});
 
-			it('should return the response when the async function returns nothing', ()=>{
+			it('should return the response when the async function returns nothing', function(){
 				async function promiseFunction( req, res, next ){
 					return;
 				}
@@ -266,7 +266,7 @@
 				});
 			});
 
-			it('should not blow up if the response has already been set', ()=>{
+			it('should not blow up if the response has already been set', function(){
 				async function promiseFunction( req, res, next ){
 					res.send( { success: false} );
 					return { success: true };
@@ -284,7 +284,7 @@
 				});
 			});
 
-			it('should not blow up if the response has already been set and next is called', ()=>{
+			it('should not blow up if the response has already been set and next is called', function(){
 				async function promiseFunction( req, res, next ){
 					res.send( { success: false} );
 					next();
@@ -302,7 +302,7 @@
 				});
 			});
 
-			it('should handle the promise rejecting when the reject has a status code', ()=>{
+			it('should handle the promise rejecting when the reject has a status code', function(){
 				async function promiseFunction( req, res, next ){
 					let errToThrow = new Error('See ya!');
 					errToThrow.statusCode = 415;
@@ -322,7 +322,7 @@
 					});
 			});
 
-			it('should handle the async throwing when the reject does not have a status code', ()=>{
+			it('should handle the async throwing when the reject does not have a status code', function(){
 				async function promiseFunction( req, res, next ){
 					let errToThrow = new Error('See ya!');
 					throw errToThrow;

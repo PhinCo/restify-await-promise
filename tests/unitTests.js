@@ -5,7 +5,7 @@
 	const assert = require('chai').assert;
 	const promissor = require('../index');
 
-	describe('restify-await-promise - Unit', () => {
+	describe('restify-await-promise - Unit', function(){
 
 		function getResInterface(){
 			return {
@@ -30,14 +30,14 @@
 
 		const req = void 0; //Will force failures because we don't want req to be used in the scenario
 
-		it('should error when not given a server', ()=>{
+		it('should error when not given a server', function(){
 			assert.throws( () =>{
 				promissor.install( void 0 );
 			}, `Can't help you if you don't give me a server.`);
 		});
 
-		describe('Promise and Async', ()=>{
-			it('should call next with the error when the function rejects', ()=>{
+		describe('Promise and Async', function(){
+			it('should call next with the error when the function rejects', function(){
 				function routeFunctionToWrap ( req, res, next ){
 					let errToThrow = new Error('Foo bar');
 					return Promise.reject( errToThrow );
@@ -61,7 +61,7 @@
 
 			});
 
-			it('should call next with the error when the function throws and log if given a logger', ()=>{
+			it('should call next with the error when the function throws and log if given a logger', function(){
 				async function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
@@ -91,7 +91,7 @@
 				});
 			});
 
-			it('should call next with the error from the transformer when the function throws and log when given a logger', ()=>{
+			it('should call next with the error from the transformer when the function throws and log when given a logger', function(){
 				async function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
@@ -132,9 +132,9 @@
 
 		});
 
-		describe('Callback based routes', ()=>{
+		describe('Callback based routes', function(){
 
-			it('should support default restify behavior when passed no options', ()=>{
+			it('should support default restify behavior when passed no options', function(){
 				function routeFunctionToWrap ( req, res, next ){
 					res.send({property: "value"});
 					next();
@@ -156,7 +156,7 @@
 				assert.isFalse( resStatusSpy.called );
 			});
 
-			it('should support the route returning an object with no options', ()=>{
+			it('should support the route returning an object with no options', function(){
 				function routeFunctionToWrap ( req, res, next ){
 					return { property: "value" };
 				}
@@ -176,7 +176,7 @@
 				assert( resStatusSpy.calledWith( 200 ) );
 			});
 
-			it('should support the route returning an object with a status code and no options', ()=>{
+			it('should support the route returning an object with a status code and no options', function(){
 				function routeFunctionToWrap ( req, res, next ){
 					return { property: "value", statusCode: 499 };
 				}
@@ -196,7 +196,7 @@
 				assert( resStatusSpy.calledWith( 499 ) );
 			});
 
-			it('should error when returning a function in the callback path', ()=>{
+			it('should error when returning a function in the callback path', function(){
 				function routeFunctionToWrap ( req, res, next ){
 					return function someFunc(){ };
 				}
@@ -216,7 +216,7 @@
 				assert.isFalse( resSendSpy.called );
 			});
 
-			it('should call next with the error when the function throws', ()=>{
+			it('should call next with the error when the function throws', function(){
 				function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
@@ -236,7 +236,7 @@
 				assert.isFalse( resSendSpy.called );
 			});
 
-			it('should call next with the error when the function throws and log if given a logger', ()=>{
+			it('should call next with the error when the function throws and log if given a logger', function(){
 				function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
@@ -265,7 +265,7 @@
 				assert.equal( errorSpyArgs[1].message, 'Foo bar');
 			});
 
-			it('should call next with the error from the transformer when the function throws and log when given a logger', ()=>{
+			it('should call next with the error from the transformer when the function throws and log when given a logger', function(){
 				function routeFunctionToWrap ( req, res, next ){
 					throw new Error('Foo bar');
 				}
