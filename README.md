@@ -1,6 +1,7 @@
 # restify-await-promise
 
 [![Build Status](https://travis-ci.org/PhinCo/restify-await-promise.svg)](https://travis-ci.org/PhinCo/restify-await-promise)
+[![dependency Status](https://david-dm.org/PhinCo/restify-await-promise/dev-status.svg)](https://david-dm.org/PhinCo/restify-await-promise#info=dependencies)
 [![devDependency Status](https://david-dm.org/PhinCo/restify-await-promise/dev-status.svg)](https://david-dm.org/PhinCo/restify-await-promise#info=devDependencies)
 
 Converts restify routes to support async/await and returned promises
@@ -33,9 +34,19 @@ const options = {
 restifyPromise.install( server, options ); // Options is not required
 
 //Async function, automatically calls send with the returned object and next
-server.get('/lookup/:name', async function (req, res) {
+server.get('/lookup/:name', async function (req) {
 	return await SomePromise.work( req.parms.name );
 });
+
+server.get('/seek/:enlightenment', restifyPromise.asyncConditionalHandler([
+	{
+		version: "1.0.0",
+		handler: async function (req) {
+			const result = await searchFor( req.parms.enlightenment );
+			return result;
+		}
+    }
+]));
 
 //Promise function
 server.get('/echo/:name', function (req) {
@@ -44,7 +55,7 @@ server.get('/echo/:name', function (req) {
 });
 
 //Existing restify method
-server.get('/echo/:name', function (req, res, next) {
+server.get('/echo2/:name', function (req, res, next) {
 	  res.send(req.params);
 	  next();
 });
