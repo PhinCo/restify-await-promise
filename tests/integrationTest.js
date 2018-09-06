@@ -14,7 +14,7 @@
 		let serverInstance = false;
 
 		beforeEach( done =>{
-			serverInstance = restify.createServer({name: 'testServer'});
+			serverInstance = restify.createServer({name: 'testServer', version: "1.0.0"});
 			promissor.install( serverInstance );
 			serverInstance.listen( port, host );
 			done();
@@ -341,6 +341,28 @@
 					});
 			});
 
+		});
+
+		describe('asyncConditionalHandler', function(){
+			it('Should wrap the versioned function', async function(){
+				async function promiseFunction( req, res, next ){
+					return { success: true};
+				}
+				serverInstance.get( '/path', promissor.asyncConditionalHandler([
+					{ version: ['1.0.0'], handler: promiseFunction }
+				]));
+
+				const result = await request({
+					method: 'GET',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true
+				});
+				assert.equal( result.statusCode, 200 );
+				assert.ok( result.body );
+				const body = JSON.parse( result.body );
+				assert.isTrue( body.success );
+
+			});
 		});
 
 	});

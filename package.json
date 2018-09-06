@@ -1,6 +1,6 @@
 {
   "name": "restify-await-promise",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Restify Plugin to support promises and async/await",
   "license": "MIT",
   "repository": {
@@ -17,7 +17,7 @@
     "url": "https://github.com/PhinCo/restify-await-promise/issues"
   },
   "homepage": "https://github.com/PhinCo/restify-await-promise#readme",
-  "peerDependencies": {
+  "dependencies": {
     "restify": "^7.0.0"
   },
   "devDependencies": {
