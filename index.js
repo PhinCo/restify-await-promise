@@ -1,12 +1,8 @@
 ( function(){
 	'use strict';
 
-	const restify = require('restify');
-
-	let globalOptions = false;
-
 	function _install( restifyServer, options ){
-		globalOptions = options;
+		const optionsClone = Object.assign( {}, options );
 		if( !restifyServer ) throw new Error(`Can't help you if you don't give me a server.`);
 		['del', 'get', 'head', 'opts', 'post', 'put', 'patch'].forEach( method => {
 			const previous = restifyServer[method];
@@ -16,7 +12,7 @@
 
 				if( _isFunction( handler ) ){
 					//This wraps the conditional route handler but has no observed adverse impact
-					const wrappedFunc = _wrapRouteFunction( handler, options );
+					const wrappedFunc = _wrapRouteFunction( handler, optionsClone );
 					args.splice( args.length - 1, 1, wrappedFunc );
 				}
 
@@ -121,20 +117,6 @@
 		return !_isFunction( valueReturned );
 	}
 
-
-	function asyncConditionalHandler( candidates ){
-		if(!restify.plugins || !restify.plugins.conditionalHandler ) throw new Error(`Plugin requires`);
-		if(candidates && candidates.length > 0 ){
-			for( const candidate of candidates ){
-				if( candidate.handler ){
-					candidate.handler = _wrapRouteFunction( candidate.handler, globalOptions );
-				}
-			}
-		}
-		return restify.plugins.conditionalHandler( candidates );
-	}
-
-	exports.asyncConditionalHandler = asyncConditionalHandler;
 	exports.install = _install;
 	exports._wrapRouteFunction = _wrapRouteFunction;
 

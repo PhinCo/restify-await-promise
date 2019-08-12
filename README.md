@@ -1,10 +1,21 @@
 # restify-await-promise
 
 [![Build Status](https://travis-ci.org/PhinCo/restify-await-promise.svg)](https://travis-ci.org/PhinCo/restify-await-promise)
-[![dependency Status](https://david-dm.org/PhinCo/restify-await-promise/dev-status.svg)](https://david-dm.org/PhinCo/restify-await-promise#info=dependencies)
+[![dependency Status](https://david-dm.org/PhinCo/restify-await-promise/status.svg)](https://david-dm.org/PhinCo/restify-await-promise#info=dependencies)
+[![peerDependency Status](https://david-dm.org/PhinCo/restify-await-promise/peer-status.svg)](https://david-dm.org/PhinCo/restify-await-promise#info=peerDependencies)
 [![devDependency Status](https://david-dm.org/PhinCo/restify-await-promise/dev-status.svg)](https://david-dm.org/PhinCo/restify-await-promise#info=devDependencies)
 
-Converts restify routes to support async/await and returned promises
+Converts restify routes to support async/await and returned promises.  Works with Restify 4.x through 6.x.  May work with Restify 7+.  
+
+
+#Supported Restify Versions
+* Fully Supported
+  * 4.x to 5.x
+* Probably Works
+  * 6.x
+* Partially Compatible
+  * 7.x+ <br>
+  <strong>NOTE:</strong> Does not support Restify 7+ conditionalRouteHandler
 
 # Usage
 
@@ -37,16 +48,6 @@ restifyPromise.install( server, options ); // Options is not required
 server.get('/lookup/:name', async function (req) {
 	return await SomePromise.work( req.parms.name );
 });
-
-server.get('/seek/:enlightenment', restifyPromise.asyncConditionalHandler([
-	{
-		version: "1.0.0",
-		handler: async function (req) {
-			const result = await searchFor( req.parms.enlightenment );
-			return result;
-		}
-    }
-]));
 
 //Promise function
 server.get('/echo/:name', function (req) {
