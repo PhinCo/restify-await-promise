@@ -1,6 +1,6 @@
 {
   "name": "restify-await-promise",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Restify Plugin to support promises and async/await",
   "license": "MIT",
   "repository": {
@@ -21,13 +21,13 @@
     "restify": "^7.0.0"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "eslint": "^5.4.0",
+    "chai": "^4.2.0",
+    "eslint": "^5.16.0",
     "mocha": "^5.2.0",
     "request": "^2.88.0",
-    "request-promise": "^4.2.2",
-    "restify": "^7.0.0",
-    "sinon": "^6.1.5"
+    "request-promise": "^4.2.4",
+    "restify": "^7.7.0",
+    "sinon": "^6.3.5"
   },
   "scripts": {
     "test": "node_modules/.bin/_mocha --recursive tests",
