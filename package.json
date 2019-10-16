@@ -1,5 +1,5 @@
 {
-  "name": "restify-await-promise",
+  "name": "@connectedyard/restify-await-promise",
   "version": "2.3.0",
   "description": "Restify Plugin to support promises and async/await",
   "license": "MIT",
