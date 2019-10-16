@@ -15,7 +15,6 @@ Converts restify routes to support async/await and returned promises.  Works wit
   * 6.x
 * Partially Compatible
   * 7.x+ <br>
-  <strong>NOTE:</strong> Does not support Restify 7+ conditionalRouteHandler
 
 # Usage
 
@@ -44,22 +43,33 @@ const options = {
 
 restifyPromise.install( server, options ); // Options is not required
 
-//Async function, automatically calls send with the returned object and next
+// Async function, automatically calls send with the returned object and next
 server.get('/lookup/:name', async function (req) {
 	return await SomePromise.work( req.parms.name );
 });
 
-//Promise function
+// Promise function
 server.get('/echo/:name', function (req) {
 	const params = req.params; 
 	return Promise.resolve( { params } );
 });
 
-//Existing restify method
+// Existing restify method
 server.get('/echo2/:name', function (req, res, next) {
 	  res.send(req.params);
 	  next();
 });
+
+// Versioned Route with Restify 7+
+server.get('/seek/:enlightenment', restifyPromise.asyncConditionalHandler([	
+	{
+		version: "1.0.0",
+		handler: async function (req) {
+			const result = await searchFor( req.parms.enlightenment );
+			return result;
+		}
+	}
+]));
 
 server.listen(8080, function () {
 	  console.log('%s listening at %s', server.name, server.url);

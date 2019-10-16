@@ -1,5 +1,6 @@
 (function() {
 	'use strict';
+
 	const describe = require('mocha').describe;
 	const assert = require('chai').assert;
 	const restify = require('restify');
@@ -318,7 +319,7 @@
 						assert.fail( 'Should reject here');
 					}).catch( ex =>{
 						assert.equal( ex.statusCode, 415 );
-                        assert.notOk( JSON.parse(ex.error).message, 'Restify no longer returns messages in this way.');
+						assert.notOk( JSON.parse(ex.error).message, 'Restify no longer returns messages in this way.');
 					});
 			});
 
@@ -340,6 +341,73 @@
 						assert.equal( JSON.parse(ex.error).message, 'caused by Error: See ya!');
 					});
 			});
+		});
+
+		describe('asyncConditionalHandler', function(){
+			const { asyncConditionalHandler } = promissor;
+
+			it('Should wrap the versioned function', async function(){	
+				
+				serverInstance.get( '/path', asyncConditionalHandler([	
+					{
+						version: '1.0.0',
+						handler: req => {
+							return { success: true, version: 1 };
+						}
+					},
+					{
+						version: '2.0.0',
+						handler: req => {
+							return { success: true, version: 2 };
+						}
+					}
+				]));
+
+				const result1 = await request({	
+					method: 'GET',	
+					uri: `http://${host}:${port}/path`,	
+					resolveWithFullResponse: true,
+					json: true,
+					headers: {
+						'accept-version': '1.0.0'
+					}
+				});
+				const { statusCode: statusCode1, body: body1 } = result1;
+				assert.equal( statusCode1, 200 );	
+				assert.ok( body1 );
+				assert.isTrue( body1.success );	
+				assert.equal( body1.version, 1 );	
+
+
+				const result2 = await request({
+					method: 'GET',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true,
+					json: true,
+					headers: {
+						'accept-version': '2.0.0'
+					}
+				});
+				const { statusCode: statusCode2, body: body2 } = result2;
+				assert.equal( statusCode2, 200 );
+				assert.ok( body2 );
+				assert.isTrue( body2.success );
+				assert.equal( body2.version, 2 );
+
+				// No version header results in latest version
+				const result3 = await request({
+					method: 'GET',
+					uri: `http://${host}:${port}/path`,
+					resolveWithFullResponse: true,
+					json: true
+				});
+				const { statusCode: statusCode3, body: body3 } = result3;
+				assert.equal( statusCode3, 200 );
+				assert.ok( body3 );
+				assert.isTrue( body3.success );
+				assert.equal( body3.version, 2 );
+
+			});	
 		});
 
 	});
